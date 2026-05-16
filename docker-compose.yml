@@ -1,20 +1,18 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: crm-postgres
+    container_name: erp-postgres
     restart: always
     environment:
-      POSTGRES_USER: crm
-      POSTGRES_PASSWORD: crm_password
-      POSTGRES_DB: crm_db
+      POSTGRES_USER: erp
+      POSTGRES_PASSWORD: erp_password
+      POSTGRES_DB: erp_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U crm -d crm_db"]
+      test: ["CMD-SHELL", "pg_isready -U erp -d erp_db"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,10 +21,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-    container_name: crm-api
+    container_name: erp-api
     restart: always
     environment:
-      DATABASE_URL: postgresql://crm:crm_password@postgres:5432/crm_db?schema=public
+      DATABASE_URL: postgresql://erp:erp_password@postgres:5432/erp_db?schema=public
       JWT_SECRET: super-secret-key-change-in-production
       NODE_ENV: production
     ports:
@@ -37,25 +35,29 @@ services:
     volumes:
       - uploads:/app/uploads
 
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    container_name: crm-web
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api
-
   admin:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
-    container_name: crm-admin
+    container_name: erp-admin
     restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
     ports:
       - "3002:3002"
+    depends_on:
+      - api
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: erp-web
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+    ports:
+      - "3000:3000"
     depends_on:
       - api
 

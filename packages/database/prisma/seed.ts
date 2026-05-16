@@ -1,4 +1,4 @@
-import { PrismaClient, AccountType, InvoiceStatus, PaymentMethod } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -32,20 +32,20 @@ async function main() {
 
   // Chart of Accounts
   const accounts = [
-    { code: '1000', name: 'الأصول', type: AccountType.ASSET, balance: 0 },
-    { code: '1100', name: 'النقدية', type: AccountType.ASSET, balance: 50000 },
-    { code: '1200', name: 'الذمم المدينة', type: AccountType.ASSET, balance: 15000 },
-    { code: '1300', name: 'المخزون', type: AccountType.ASSET, balance: 25000 },
-    { code: '2000', name: 'الالتزامات', type: AccountType.LIABILITY, balance: 0 },
-    { code: '2100', name: 'الذمم الدائنة', type: AccountType.LIABILITY, balance: 10000 },
-    { code: '2200', name: 'القروض', type: AccountType.LIABILITY, balance: 20000 },
-    { code: '3000', name: 'حقوق الملكية', type: AccountType.EQUITY, balance: 35000 },
-    { code: '3100', name: 'رأس المال', type: AccountType.EQUITY, balance: 35000 },
-    { code: '4000', name: 'الإيرادات', type: AccountType.REVENUE, balance: 0 },
-    { code: '4100', name: 'مبيعات', type: AccountType.REVENUE, balance: 80000 },
-    { code: '5000', name: 'المصروفات', type: AccountType.EXPENSE, balance: 0 },
-    { code: '5100', name: 'مصروفات التشغيل', type: AccountType.EXPENSE, balance: 25000 },
-    { code: '5200', name: 'المرتبات', type: AccountType.EXPENSE, balance: 15000 },
+    { code: '1000', name: 'الأصول', type: 'ASSET', balance: 0 },
+    { code: '1100', name: 'النقدية', type: 'ASSET', balance: 50000 },
+    { code: '1200', name: 'الذمم المدينة', type: 'ASSET', balance: 15000 },
+    { code: '1300', name: 'المخزون', type: 'ASSET', balance: 25000 },
+    { code: '2000', name: 'الالتزامات', type: 'LIABILITY', balance: 0 },
+    { code: '2100', name: 'الذمم الدائنة', type: 'LIABILITY', balance: 10000 },
+    { code: '2200', name: 'القروض', type: 'LIABILITY', balance: 20000 },
+    { code: '3000', name: 'حقوق الملكية', type: 'EQUITY', balance: 35000 },
+    { code: '3100', name: 'رأس المال', type: 'EQUITY', balance: 35000 },
+    { code: '4000', name: 'الإيرادات', type: 'REVENUE', balance: 0 },
+    { code: '4100', name: 'مبيعات', type: 'REVENUE', balance: 80000 },
+    { code: '5000', name: 'المصروفات', type: 'EXPENSE', balance: 0 },
+    { code: '5100', name: 'مصروفات التشغيل', type: 'EXPENSE', balance: 25000 },
+    { code: '5200', name: 'المرتبات', type: 'EXPENSE', balance: 15000 },
   ];
 
   for (const acc of accounts) {
@@ -89,7 +89,7 @@ async function main() {
       taxRate: 15,
       taxAmount: 1500,
       total: 11500,
-      status: InvoiceStatus.SENT,
+      status: 'SENT',
       notes: 'فاتورة خدمات تقنية',
       userId: admin.id,
       customerId: customer1.id,
@@ -107,7 +107,7 @@ async function main() {
     data: {
       date: new Date(),
       amount: 5000,
-      method: PaymentMethod.BANK_TRANSFER,
+      method: 'BANK_TRANSFER',
       reference: 'TRX-001',
       notes: 'دفعة أولى',
       userId: admin.id,
@@ -181,6 +181,35 @@ async function main() {
       customerId: customer1.id,
     },
   });
+
+  // Seed system modules
+  const modules = [
+    { code: 'crm', name: 'CRM - إدارة العملاء', isCore: true },
+    { code: 'accounting', name: 'المحاسبة', isCore: false },
+    { code: 'logistics', name: 'اللوجستيك', isCore: false },
+    { code: 'property', name: 'إدارة الأملاك', isCore: false },
+    { code: 'vms', name: 'كاميرات المراقبة', isCore: false },
+  ];
+
+  for (const mod of modules) {
+    await prisma.systemModule.upsert({
+      where: { code: mod.code },
+      update: {},
+      create: mod,
+    });
+  }
+
+  // Assign CRM + Accounting licenses to admin
+  const crmModule = await prisma.systemModule.findUnique({ where: { code: 'crm' } });
+  const accountingModule = await prisma.systemModule.findUnique({ where: { code: 'accounting' } });
+
+  if (crmModule && accountingModule) {
+    await prisma.userLicense.upsert({
+      where: { userId_moduleId: { userId: admin.id, moduleId: accountingModule.id } },
+      update: {},
+      create: { userId: admin.id, moduleId: accountingModule.id, isActive: true },
+    });
+  }
 
   console.log('✅ Seed completed!');
   console.log(`👤 Admin: admin@crm.com / admin123`);

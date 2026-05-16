@@ -14,6 +14,7 @@ import { ReportsModule } from './reports/reports.module';
 import { UploadModule } from './upload/upload.module';
 import { AuditModule } from './audit/audit.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { LicensingModule } from './licensing/licensing.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     UploadModule,
     AuditModule,
     NotificationsModule,
+    LicensingModule,
   ],
 })
 export class AppModule {}
