@@ -15,7 +15,7 @@ export default function AccountsPage() {
   const token = typeof document !== 'undefined' ? document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] : '';
 
   const fetchData = () => {
-    fetch('http://localhost:3001/api/accounts', { headers: { Authorization: `Bearer ${token}` } })
+    fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/accounts', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(setData)
       .finally(() => setLoading(false));
@@ -25,7 +25,7 @@ export default function AccountsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch('http://localhost:3001/api/accounts', {
+    await fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/accounts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(form),

@@ -9,7 +9,7 @@ export default function Dashboard() {
   const token = typeof document !== 'undefined' ? document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] : '';
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/reports/dashboard', { headers: { Authorization: `Bearer ${token}` } })
+    fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/reports/dashboard', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => { setStats(data); setLoading(false); })
       .catch(() => setLoading(false));

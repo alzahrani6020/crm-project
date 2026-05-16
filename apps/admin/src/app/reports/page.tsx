@@ -10,9 +10,9 @@ export default function ReportsPage() {
   const token = typeof document !== 'undefined' ? document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] : '';
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/reports/dashboard', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setDashboard);
-    fetch('http://localhost:3001/api/reports/profit-loss', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setPnl);
-    fetch('http://localhost:3001/api/reports/trial-balance', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setTb);
+    fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/reports/dashboard', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setDashboard);
+    fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/reports/profit-loss', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setPnl);
+    fetch('${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/reports/trial-balance', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()).then(setTb);
   }, []);
 
   return (

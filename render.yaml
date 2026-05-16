@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: crm-api
+    runtime: node
+    rootDir: apps/api
+    buildCommand: npm install && cd ../../packages/database && npx prisma generate && npx prisma migrate deploy && cd ../../apps/api && npx nest build
+    startCommand: node dist/main.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+    plan: free
+
+  - type: web
+    name: crm-admin
+    runtime: node
+    rootDir: apps/admin
+    buildCommand: npm install && cd ../../packages/database && npx prisma generate && cd ../../apps/admin && next build
+    startCommand: npx next start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+    plan: free
