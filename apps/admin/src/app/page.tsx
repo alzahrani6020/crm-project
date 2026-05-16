@@ -1,65 +1,75 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Card } from '@/components/Card';
 import Link from 'next/link';
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const token = typeof document !== 'undefined' ? document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1] : '';
 
   useEffect(() => {
-    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-    fetch('http://localhost:3001/api/reports/dashboard', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch('http://localhost:3001/api/reports/dashboard', { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => { setStats(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div style={{ padding: 40 }}>جاري التحميل...</div>;
+  if (loading) return <div className="p-8">جاري التحميل...</div>;
 
   return (
     <div>
-      <h1 style={{ marginBottom: 32 }}>لوحة التحكم</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-8">لوحة التحكم</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 20, marginBottom: 40 }}>
-        <StatCard title="إجمالي الإيرادات" value={`${stats?.totalRevenue?.toLocaleString() || 0} ريال`} color="#10b981" />
-        <StatCard title="المدفوعات" value={`${stats?.totalPayments?.toLocaleString() || 0} ريال`} color="#4f46e5" />
-        <StatCard title="المصروفات" value={`${stats?.totalExpenses?.toLocaleString() || 0} ريال`} color="#ef4444" />
-        <StatCard title="صافي الدخل" value={`${stats?.netIncome?.toLocaleString() || 0} ريال`} color="#f59e0b" />
-        <StatCard title="العملاء" value={stats?.customersCount || 0} color="#06b6d4" />
-        <StatCard title="فواتير غير مسددة" value={stats?.unpaidInvoices || 0} color="#ec4899" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">إجمالي الإيرادات</div>
+          <div className="text-3xl font-bold text-emerald-600">{stats?.totalRevenue?.toLocaleString() || 0} ريال</div>
+        </Card>
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">المدفوعات المحصلة</div>
+          <div className="text-3xl font-bold text-indigo-600">{stats?.totalPayments?.toLocaleString() || 0} ريال</div>
+        </Card>
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">المصروفات</div>
+          <div className="text-3xl font-bold text-red-600">{stats?.totalExpenses?.toLocaleString() || 0} ريال</div>
+        </Card>
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">صافي الدخل</div>
+          <div className="text-3xl font-bold text-amber-600">{stats?.netIncome?.toLocaleString() || 0} ريال</div>
+        </Card>
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">عدد العملاء</div>
+          <div className="text-3xl font-bold text-blue-600">{stats?.customersCount || 0}</div>
+        </Card>
+        <Card>
+          <div className="text-sm text-gray-500 mb-1">فواتير غير مسددة</div>
+          <div className="text-3xl font-bold text-rose-600">{stats?.unpaidInvoices || 0}</div>
+        </Card>
       </div>
 
-      <h2 style={{ marginBottom: 20 }}>الأقسام</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 20 }}>
-        <Card href="/customers" title="العملاء" desc="إدارة العملاء" color="#4f46e5" />
-        <Card href="/invoices" title="الفواتير" desc="إصدار ومتابعة الفواتير" color="#f59e0b" />
-        <Card href="/accounts" title="دليل الحسابات" desc="الحسابات المحاسبية" color="#10b981" />
-        <Card href="/expenses" title="المصروفات" desc="تتبع المصروفات" color="#ec4899" />
-        <Card href="/journal-entries" title="القيود اليومية" desc="العمليات المحاسبية" color="#ef4444" />
-        <Card href="/reports" title="التقارير" desc="التقارير المالية" color="#6366f1" />
+      <h2 className="text-lg font-bold text-gray-800 mb-4">الأقسام</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <NavCard href="/customers" title="العملاء" desc="إدارة بيانات العملاء" color="bg-blue-500" />
+        <NavCard href="/invoices" title="الفواتير" desc="إصدار ومتابعة الفواتير" color="bg-amber-500" />
+        <NavCard href="/accounts" title="دليل الحسابات" desc="الحسابات المحاسبية" color="bg-emerald-500" />
+        <NavCard href="/expenses" title="المصروفات" desc="تتبع المصروفات" color="bg-rose-500" />
+        <NavCard href="/journal-entries" title="القيود اليومية" desc="العمليات المحاسبية" color="bg-red-500" />
+        <NavCard href="/leads" title="العملاء المحتملين" desc="متابعة الفرص" color="bg-purple-500" />
+        <NavCard href="/deals" title="الصفقات" desc="إدارة العقود" color="bg-cyan-500" />
+        <NavCard href="/reports" title="التقارير" desc="التقارير المالية" color="bg-indigo-500" />
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, color }: { title: string; value: string | number; color: string }) {
+function NavCard({ href, title, desc, color }: { href: string; title: string; desc: string; color: string }) {
   return (
-    <div style={{ background: '#fff', padding: 24, borderRadius: 12, border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-      <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 8 }}>{title}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color }}>{value}</div>
-    </div>
-  );
-}
-
-function Card({ href, title, desc, color }: { href: string; title: string; desc: string; color: string }) {
-  return (
-    <Link href={href} style={{ textDecoration: 'none' }}>
-      <div style={{ padding: 24, borderRadius: 12, background: '#fff', border: '1px solid #e5e7eb', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', cursor: 'pointer' }}>
-        <div style={{ width: 40, height: 40, borderRadius: 8, background: color, marginBottom: 12 }} />
-        <h3 style={{ margin: 0, color: '#111827' }}>{title}</h3>
-        <p style={{ margin: '8px 0 0', color: '#6b7280', fontSize: 14 }}>{desc}</p>
+    <Link href={href} className="block">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow">
+        <div className={`w-10 h-10 rounded-lg ${color} mb-4`} />
+        <h3 className="font-bold text-gray-800 mb-1">{title}</h3>
+        <p className="text-sm text-gray-500">{desc}</p>
       </div>
     </Link>
   );

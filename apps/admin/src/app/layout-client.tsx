@@ -1,49 +1,52 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import './globals.css';
+
+const nav = [
+  { href: '/', label: 'الرئيسية', icon: '📊' },
+  { href: '/customers', label: 'العملاء', icon: '👥' },
+  { href: '/leads', label: 'العملاء المحتملين', icon: '🔍' },
+  { href: '/deals', label: 'الصفقات', icon: '💼' },
+  { href: '/accounts', label: 'دليل الحسابات', icon: '📒' },
+  { href: '/invoices', label: 'الفواتير', icon: '🧾' },
+  { href: '/journal-entries', label: 'القيود اليومية', icon: '📋' },
+  { href: '/expenses', label: 'المصروفات', icon: '💸' },
+  { href: '/reports', label: 'التقارير', icon: '📈' },
+];
 
 export default function LayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   if (pathname === '/login') return <>{children}</>;
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <aside style={{ width: 260, background: '#1e293b', color: '#fff', padding: 24, flexShrink: 0 }}>
-        <h2 style={{ margin: '0 0 24px', fontSize: 22 }}>CRM Admin</h2>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <NavLink href="/" label="الرئيسية" />
-          <NavLink href="/customers" label="العملاء" />
-          <NavLink href="/leads" label="العملاء المحتملين" />
-          <NavLink href="/deals" label="الصفقات" />
-          <hr style={{ borderColor: '#334155', margin: '12px 0' }} />
-          <NavLink href="/accounts" label="دليل الحسابات" />
-          <NavLink href="/invoices" label="الفواتير" />
-          <NavLink href="/journal-entries" label="القيود اليومية" />
-          <NavLink href="/expenses" label="المصروفات" />
-          <NavLink href="/reports" label="التقارير" />
+    <div className="flex min-h-screen bg-gray-50">
+      <aside className="w-64 bg-slate-900 text-white flex flex-col fixed h-full">
+        <div className="p-6 border-b border-slate-700">
+          <h2 className="text-xl font-bold">CRM المحاسبي</h2>
+        </div>
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {nav.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                  active ? 'bg-indigo-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
+        <div className="p-4 border-t border-slate-700 text-xs text-slate-400 text-center">
+          CRM + Accounting v1.0
+        </div>
       </aside>
-      <main style={{ flex: 1, padding: 32 }}>
-        {children}
-      </main>
+      <main className="flex-1 mr-64 p-8">{children}</main>
     </div>
-  );
-}
-
-function NavLink({ href, label }: { href: string; label: string }) {
-  const pathname = usePathname();
-  const active = pathname === href;
-  return (
-    <Link href={href} style={{
-      padding: '10px 16px',
-      borderRadius: 8,
-      background: active ? '#4f46e5' : 'transparent',
-      color: '#fff',
-      textDecoration: 'none',
-      fontSize: 15,
-      transition: 'background 0.2s'
-    }}>
-      {label}
-    </Link>
   );
 }

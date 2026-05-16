@@ -58,7 +58,7 @@ export default function LoginPage() {
           <input
             type="email"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e: any) => setEmail(e.target.value)}
             required
             style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #d1d5db', fontSize: 16 }}
           />
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <input
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e: any) => setPassword(e.target.value)}
             required
             style={{ width: '100%', padding: 12, borderRadius: 8, border: '1px solid #d1d5db', fontSize: 16 }}
           />
