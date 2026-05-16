@@ -25,6 +25,10 @@ model User {
   payments  Payment[]
   expenses  Expense[]
   licenses  UserLicense[]
+  vehicles  Vehicle[]
+  drivers   Driver[]
+  shipments Shipment[]
+  maintenances Maintenance[]
 
   @@map("users")
 }
@@ -217,6 +221,110 @@ model Expense {
   user        User     @relation(fields: [userId], references: [id])
 
   @@map("expenses")
+}
+
+model Vehicle {
+  id          String   @id @default(cuid())
+  plateNumber String   @map("plate_number")
+  type        String
+  model       String?
+  year        Int?
+  capacity    Float?
+  status      String   @default("ACTIVE")
+  gpsLocation String?  @map("gps_location")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  shipments   Shipment[]
+  maintenances Maintenance[]
+
+  @@map("vehicles")
+}
+
+model Driver {
+  id          String   @id @default(cuid())
+  name        String
+  licenseNo   String   @map("license_no")
+  phone       String?
+  email       String?
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  shipments   Shipment[]
+
+  @@map("drivers")
+}
+
+model Shipment {
+  id          String   @id @default(cuid())
+  trackingNo  String   @map("tracking_no")
+  senderName  String   @map("sender_name")
+  senderPhone String?  @map("sender_phone")
+  senderAddr  String?  @map("sender_address")
+  receiverName  String   @map("receiver_name")
+  receiverPhone String?  @map("receiver_phone")
+  receiverAddr  String?  @map("receiver_address")
+  weight      Float?
+  status      String   @default("PENDING")
+  notes       String?
+  deliveredAt DateTime? @map("delivered_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  vehicleId   String?  @map("vehicle_id")
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  driverId    String?  @map("driver_id")
+  driver      Driver?  @relation(fields: [driverId], references: [id])
+
+  routes      Route[]
+
+  @@map("shipments")
+}
+
+model Route {
+  id          String   @id @default(cuid())
+  startPoint  String   @map("start_point")
+  endPoint    String   @map("end_point")
+  distance    Float?
+  estimatedTime Int?   @map("estimated_time")
+  actualTime  Int?     @map("actual_time")
+  status      String   @default("PLANNED")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  shipmentId  String   @map("shipment_id")
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@map("routes")
+}
+
+model Maintenance {
+  id          String   @id @default(cuid())
+  type        String
+  description String?
+  cost        Float?
+  date        DateTime
+  nextDate    DateTime? @map("next_date")
+  status      String   @default("COMPLETED")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+
+  vehicleId   String   @map("vehicle_id")
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+
+  @@map("maintenances")
 }
 
 model AuditLog {

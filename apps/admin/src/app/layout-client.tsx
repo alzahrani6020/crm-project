@@ -8,6 +8,7 @@ const nav = [
   { href: '/customers', label: 'العملاء', icon: '👥' },
   { href: '/leads', label: 'العملاء المحتملين', icon: '🔍' },
   { href: '/deals', label: 'الصفقات', icon: '💼' },
+  { href: '/logistics', label: 'اللوجستيك', icon: '🚚' },
   { href: '/accounts', label: 'دليل الحسابات', icon: '📒' },
   { href: '/invoices', label: 'الفواتير', icon: '🧾' },
   { href: '/journal-entries', label: 'القيود اليومية', icon: '📋' },

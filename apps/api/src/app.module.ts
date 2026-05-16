@@ -15,6 +15,11 @@ import { UploadModule } from './upload/upload.module';
 import { AuditModule } from './audit/audit.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { LicensingModule } from './licensing/licensing.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
+import { DriversModule } from './drivers/drivers.module';
+import { ShipmentsModule } from './shipments/shipments.module';
+import { RoutesModule } from './routes/routes.module';
+import { MaintenanceModule } from './maintenance/maintenance.module';
 
 @Module({
   imports: [
@@ -34,6 +39,11 @@ import { LicensingModule } from './licensing/licensing.module';
     AuditModule,
     NotificationsModule,
     LicensingModule,
+    VehiclesModule,
+    DriversModule,
+    ShipmentsModule,
+    RoutesModule,
+    MaintenanceModule,
   ],
 })
 export class AppModule {}

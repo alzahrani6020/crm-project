@@ -211,6 +211,58 @@ async function main() {
     });
   }
 
+  // Seed logistics data
+  const vehicle = await prisma.vehicle.create({
+    data: {
+      plateNumber: '1234-ABC',
+      type: 'شاحنة صغيرة',
+      model: 'Toyota Hilux',
+      year: 2023,
+      capacity: 2000,
+      status: 'ACTIVE',
+      userId: admin.id,
+    },
+  });
+
+  const driver = await prisma.driver.create({
+    data: {
+      name: 'أحمد السائق',
+      licenseNo: 'LIC-001',
+      phone: '0500000003',
+      status: 'ACTIVE',
+      userId: admin.id,
+    },
+  });
+
+  await prisma.shipment.create({
+    data: {
+      trackingNo: 'SHP-001',
+      senderName: 'شركة التقنية',
+      senderPhone: '0500000001',
+      senderAddr: 'الرياض',
+      receiverName: 'مؤسسة الأمل',
+      receiverPhone: '0500000002',
+      receiverAddr: 'جدة',
+      weight: 50,
+      status: 'IN_TRANSIT',
+      userId: admin.id,
+      vehicleId: vehicle.id,
+      driverId: driver.id,
+    },
+  });
+
+  await prisma.maintenance.create({
+    data: {
+      type: 'تغيير زيت',
+      description: 'صيانة دورية',
+      cost: 250,
+      date: new Date(),
+      nextDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      userId: admin.id,
+      vehicleId: vehicle.id,
+    },
+  });
+
   console.log('✅ Seed completed!');
   console.log(`👤 Admin: admin@crm.com / admin123`);
   console.log(`👤 User: user@crm.com / user123`);
